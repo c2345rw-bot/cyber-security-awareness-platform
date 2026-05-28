@@ -3,20 +3,34 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: CyberSafe Teens API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: lessons
+    description: Lesson content and progress
+  - name: quizzes
+    description: Quizzes and results
+  - name: simulator
+    description: Phishing simulator
+  - name: scams
+    description: Scam reports
+  - name: users
+    description: User profiles and progress
+  - name: leaderboard
+    description: Leaderboard and rankings
+  - name: password
+    description: Password strength checking
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +38,668 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # ── Lessons ──────────────────────────────────────────────────────────────────
+  /lessons:
+    get:
+      operationId: getLessons
+      tags: [lessons]
+      summary: List all lessons
+      responses:
+        "200":
+          description: List of lessons
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Lesson"
+
+  /lessons/{id}:
+    get:
+      operationId: getLesson
+      tags: [lessons]
+      summary: Get a single lesson with full content
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Lesson detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LessonDetail"
+        "404":
+          description: Not found
+
+  # ── Lesson progress ──────────────────────────────────────────────────────────
+  /progress:
+    get:
+      operationId: getUserProgress
+      tags: [users]
+      summary: Get progress for a user (by session/nickname)
+      parameters:
+        - name: username
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User progress
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProgress"
+
+  /progress/complete:
+    post:
+      operationId: markLessonComplete
+      tags: [users]
+      summary: Mark a lesson as completed
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LessonCompleteInput"
+      responses:
+        "200":
+          description: Updated progress
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProgress"
+
+  # ── Quizzes ──────────────────────────────────────────────────────────────────
+  /quizzes/{lessonId}:
+    get:
+      operationId: getQuiz
+      tags: [quizzes]
+      summary: Get quiz questions for a lesson
+      parameters:
+        - name: lessonId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Quiz questions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/QuizQuestion"
+
+  /quizzes/submit:
+    post:
+      operationId: submitQuiz
+      tags: [quizzes]
+      summary: Submit quiz answers and get score
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuizSubmission"
+      responses:
+        "200":
+          description: Quiz result with score and explanations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuizResult"
+
+  # ── Phishing Simulator ───────────────────────────────────────────────────────
+  /simulator/scenarios:
+    get:
+      operationId: getSimulatorScenarios
+      tags: [simulator]
+      summary: Get all phishing simulator scenarios
+      responses:
+        "200":
+          description: List of scenarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SimulatorScenario"
+
+  /simulator/answer:
+    post:
+      operationId: submitSimulatorAnswer
+      tags: [simulator]
+      summary: Submit an answer for a simulator scenario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SimulatorAnswerInput"
+      responses:
+        "200":
+          description: Result with explanation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimulatorAnswerResult"
+
+  # ── Password Checker ─────────────────────────────────────────────────────────
+  /password/check:
+    post:
+      operationId: checkPassword
+      tags: [password]
+      summary: Check password strength
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordCheckInput"
+      responses:
+        "200":
+          description: Password strength analysis
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PasswordCheckResult"
+
+  # ── Scam Reports ─────────────────────────────────────────────────────────────
+  /scams:
+    get:
+      operationId: getScamReports
+      tags: [scams]
+      summary: Get community scam reports
+      parameters:
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: List of scam reports
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ScamReport"
+    post:
+      operationId: submitScamReport
+      tags: [scams]
+      summary: Submit a new scam report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScamReportInput"
+      responses:
+        "201":
+          description: Report submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScamReport"
+
+  /scams/stats:
+    get:
+      operationId: getScamStats
+      tags: [scams]
+      summary: Get scam statistics by category
+      responses:
+        "200":
+          description: Scam category statistics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ScamStat"
+
+  # ── Leaderboard ──────────────────────────────────────────────────────────────
+  /leaderboard:
+    get:
+      operationId: getLeaderboard
+      tags: [leaderboard]
+      summary: Get top users leaderboard
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Leaderboard entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LeaderboardEntry"
+
+  # ── Dashboard Stats ──────────────────────────────────────────────────────────
+  /stats/platform:
+    get:
+      operationId: getPlatformStats
+      tags: [users]
+      summary: Get overall platform statistics
+      responses:
+        "200":
+          description: Platform-wide stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformStats"
+
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
         status:
           type: string
-      required:
-        - status
 
+    # ── Lessons ────────────────────────────────────────────────────────────────
+    Lesson:
+      type: object
+      required: [id, slug, level, titleEn, titleUz, titleRu, descriptionEn, descriptionUz, descriptionRu, xpReward, estimatedMinutes]
+      properties:
+        id:
+          type: integer
+        slug:
+          type: string
+        level:
+          type: integer
+        titleEn:
+          type: string
+        titleUz:
+          type: string
+        titleRu:
+          type: string
+        descriptionEn:
+          type: string
+        descriptionUz:
+          type: string
+        descriptionRu:
+          type: string
+        xpReward:
+          type: integer
+        estimatedMinutes:
+          type: integer
+        icon:
+          type: ["string", "null"]
+
+    LessonDetail:
+      type: object
+      required: [id, slug, level, titleEn, titleUz, titleRu, contentEn, contentUz, contentRu, realExampleEn, realExampleUz, realExampleRu, actionStepsEn, actionStepsUz, actionStepsRu, xpReward, estimatedMinutes]
+      properties:
+        id:
+          type: integer
+        slug:
+          type: string
+        level:
+          type: integer
+        titleEn:
+          type: string
+        titleUz:
+          type: string
+        titleRu:
+          type: string
+        contentEn:
+          type: string
+        contentUz:
+          type: string
+        contentRu:
+          type: string
+        realExampleEn:
+          type: string
+        realExampleUz:
+          type: string
+        realExampleRu:
+          type: string
+        actionStepsEn:
+          type: string
+        actionStepsUz:
+          type: string
+        actionStepsRu:
+          type: string
+        xpReward:
+          type: integer
+        estimatedMinutes:
+          type: integer
+        icon:
+          type: ["string", "null"]
+
+    # ── Progress ───────────────────────────────────────────────────────────────
+    UserProgress:
+      type: object
+      required: [username, completedLessons, totalXp, currentStreak, badges, quizScores]
+      properties:
+        username:
+          type: string
+        completedLessons:
+          type: array
+          items:
+            type: integer
+        totalXp:
+          type: integer
+        currentStreak:
+          type: integer
+        badges:
+          type: array
+          items:
+            type: string
+        quizScores:
+          type: object
+          additionalProperties:
+            type: integer
+
+    LessonCompleteInput:
+      type: object
+      required: [username, lessonId]
+      properties:
+        username:
+          type: string
+        lessonId:
+          type: integer
+        quizScore:
+          type: ["integer", "null"]
+
+    # ── Quizzes ────────────────────────────────────────────────────────────────
+    QuizQuestion:
+      type: object
+      required: [id, lessonId, questionEn, questionUz, questionRu, options, correctIndex, explanationEn, explanationUz, explanationRu]
+      properties:
+        id:
+          type: integer
+        lessonId:
+          type: integer
+        questionEn:
+          type: string
+        questionUz:
+          type: string
+        questionRu:
+          type: string
+        options:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuizOption"
+        correctIndex:
+          type: integer
+        explanationEn:
+          type: string
+        explanationUz:
+          type: string
+        explanationRu:
+          type: string
+
+    QuizOption:
+      type: object
+      required: [en, uz, ru]
+      properties:
+        en:
+          type: string
+        uz:
+          type: string
+        ru:
+          type: string
+
+    QuizSubmission:
+      type: object
+      required: [username, lessonId, answers]
+      properties:
+        username:
+          type: string
+        lessonId:
+          type: integer
+        answers:
+          type: array
+          items:
+            type: integer
+
+    QuizResult:
+      type: object
+      required: [score, total, passed, xpEarned, feedback]
+      properties:
+        score:
+          type: integer
+        total:
+          type: integer
+        passed:
+          type: boolean
+        xpEarned:
+          type: integer
+        feedback:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuizFeedback"
+
+    QuizFeedback:
+      type: object
+      required: [questionId, correct, explanationEn, explanationUz, explanationRu]
+      properties:
+        questionId:
+          type: integer
+        correct:
+          type: boolean
+        explanationEn:
+          type: string
+        explanationUz:
+          type: string
+        explanationRu:
+          type: string
+
+    # ── Phishing Simulator ─────────────────────────────────────────────────────
+    SimulatorScenario:
+      type: object
+      required: [id, type, platform, messageEn, messageUz, messageRu, isScam, warningSignsEn, warningSignsUz, warningSignsRu, explanationEn, explanationUz, explanationRu]
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+        platform:
+          type: string
+        messageEn:
+          type: string
+        messageUz:
+          type: string
+        messageRu:
+          type: string
+        senderName:
+          type: ["string", "null"]
+        senderAvatar:
+          type: ["string", "null"]
+        isScam:
+          type: boolean
+        warningSignsEn:
+          type: string
+        warningSignsUz:
+          type: string
+        warningSignsRu:
+          type: string
+        explanationEn:
+          type: string
+        explanationUz:
+          type: string
+        explanationRu:
+          type: string
+
+    SimulatorAnswerInput:
+      type: object
+      required: [scenarioId, username, answeredScam]
+      properties:
+        scenarioId:
+          type: integer
+        username:
+          type: string
+        answeredScam:
+          type: boolean
+
+    SimulatorAnswerResult:
+      type: object
+      required: [correct, isScam, explanationEn, explanationUz, explanationRu, warningSignsEn, warningSignsUz, warningSignsRu, xpEarned]
+      properties:
+        correct:
+          type: boolean
+        isScam:
+          type: boolean
+        explanationEn:
+          type: string
+        explanationUz:
+          type: string
+        explanationRu:
+          type: string
+        warningSignsEn:
+          type: string
+        warningSignsUz:
+          type: string
+        warningSignsRu:
+          type: string
+        xpEarned:
+          type: integer
+
+    # ── Password Checker ───────────────────────────────────────────────────────
+    PasswordCheckInput:
+      type: object
+      required: [password]
+      properties:
+        password:
+          type: string
+
+    PasswordCheckResult:
+      type: object
+      required: [score, label, timeToCrackEn, timeToCrackUz, timeToCrackRu, tipsEn, tipsUz, tipsRu, hasUppercase, hasLowercase, hasNumbers, hasSymbols, isCommon, length]
+      properties:
+        score:
+          type: integer
+        label:
+          type: string
+        timeToCrackEn:
+          type: string
+        timeToCrackUz:
+          type: string
+        timeToCrackRu:
+          type: string
+        tipsEn:
+          type: array
+          items:
+            type: string
+        tipsUz:
+          type: array
+          items:
+            type: string
+        tipsRu:
+          type: array
+          items:
+            type: string
+        hasUppercase:
+          type: boolean
+        hasLowercase:
+          type: boolean
+        hasNumbers:
+          type: boolean
+        hasSymbols:
+          type: boolean
+        isCommon:
+          type: boolean
+        length:
+          type: integer
+
+    # ── Scam Reports ───────────────────────────────────────────────────────────
+    ScamReport:
+      type: object
+      required: [id, message, category, platform, reportedAt, upvotes]
+      properties:
+        id:
+          type: integer
+        message:
+          type: string
+        category:
+          type: string
+        platform:
+          type: string
+        reportedAt:
+          type: string
+        upvotes:
+          type: integer
+        warningEn:
+          type: ["string", "null"]
+        warningUz:
+          type: ["string", "null"]
+        warningRu:
+          type: ["string", "null"]
+
+    ScamReportInput:
+      type: object
+      required: [message, category, platform]
+      properties:
+        message:
+          type: string
+        category:
+          type: string
+        platform:
+          type: string
+        reporterName:
+          type: ["string", "null"]
+
+    ScamStat:
+      type: object
+      required: [category, count]
+      properties:
+        category:
+          type: string
+        count:
+          type: integer
+
+    # ── Leaderboard ────────────────────────────────────────────────────────────
+    LeaderboardEntry:
+      type: object
+      required: [rank, username, totalXp, completedLessons, badges, currentStreak]
+      properties:
+        rank:
+          type: integer
+        username:
+          type: string
+        totalXp:
+          type: integer
+        completedLessons:
+          type: integer
+        badges:
+          type: array
+          items:
+            type: string
+        currentStreak:
+          type: integer
+
+    # ── Platform Stats ─────────────────────────────────────────────────────────
+    PlatformStats:
+      type: object
+      required: [totalUsers, totalLessonsCompleted, totalScamsReported, totalQuizzesTaken]
+      properties:
+        totalUsers:
+          type: integer
+        totalLessonsCompleted:
+          type: integer
+        totalScamsReported:
+          type: integer
+        totalQuizzesTaken:
+          type: integer

@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "CyberSafe Teens"
+version = "1.0.0"
+id = "artifacts/cybersafe-teens"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24896
+
+[services.development]
+run = "pnpm --filter @workspace/cybersafe-teens run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/cybersafe-teens", "run", "build" ]
+publicDir = "artifacts/cybersafe-teens/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24896"
+BASE_PATH = "/"
