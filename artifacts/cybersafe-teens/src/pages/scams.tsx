@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useGetScamReports, useGetScamStats, useSubmitScamReport, getGetScamReportsQueryKey, getGetScamStatsQueryKey } from "@workspace/api-client-react";
 import { useLanguage } from "@/lib/i18n";
-import { ShieldAlert, Plus, Filter, MessageSquare, AlertTriangle } from "lucide-react";
+import { ShieldAlert, Plus, MessageSquare, AlertTriangle, Info } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,9 +16,11 @@ export default function Scams() {
   const { t, language } = useLanguage();
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  
+
   const queryClient = useQueryClient();
-  const { data: reports, isLoading: isLoadingReports } = useGetScamReports(categoryFilter !== "all" ? { category: categoryFilter } : {});
+  const { data: reports, isLoading: isLoadingReports } = useGetScamReports(
+    categoryFilter !== "all" ? { category: categoryFilter } : {}
+  );
   const { data: stats } = useGetScamStats();
   const submitReport = useSubmitScamReport();
 
@@ -36,12 +38,20 @@ export default function Scams() {
       await submitReport.mutateAsync({ data: formData });
       setIsDialogOpen(false);
       setFormData({ platform: "", category: "", message: "" });
-      toast.success("Report submitted successfully.");
+      toast.success(t("report_submitted_success"));
       queryClient.invalidateQueries({ queryKey: getGetScamReportsQueryKey() });
       queryClient.invalidateQueries({ queryKey: getGetScamStatsQueryKey() });
-    } catch (err) {
-      toast.error("Failed to submit report.");
+    } catch {
+      toast.error(t("report_submitted_error"));
     }
+  };
+
+  const categoryLabels: Record<string, string> = {
+    telegram: "Telegram",
+    instagram: "Instagram",
+    phishing: "Phishing",
+    job_scam: "Fake Job",
+    other: "Other",
   };
 
   return (
@@ -52,12 +62,12 @@ export default function Scams() {
             <ShieldAlert className="w-8 h-8 text-destructive" />
             {t("scams_title")}
           </h1>
-          <p className="text-muted-foreground mt-2">{t("home_hero_subtitle")}</p>
+          <p className="text-muted-foreground mt-2">{t("scams_subtitle")}</p>
         </div>
-        
+
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button size="lg" className="font-bold">
+            <Button size="lg" className="font-bold shrink-0">
               <Plus className="w-5 h-5 mr-2" />
               {t("report_scam")}
             </Button>
@@ -69,50 +79,70 @@ export default function Scams() {
             <form onSubmit={handleSubmit} className="space-y-4 pt-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">{t("platform")}</label>
-                <Input required value={formData.platform} onChange={e => setFormData({...formData, platform: e.target.value})} placeholder="e.g. Telegram, Instagram" />
+                <Input
+                  required
+                  value={formData.platform}
+                  onChange={e => setFormData({ ...formData, platform: e.target.value })}
+                  placeholder="e.g. Telegram, Instagram, SMS"
+                />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">{t("category")}</label>
-                <Select required value={formData.category} onValueChange={v => setFormData({...formData, category: v})}>
+                <Select required value={formData.category} onValueChange={v => setFormData({ ...formData, category: v })}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
+                    <SelectValue placeholder={t("select_category")} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="phishing">Phishing</SelectItem>
-                    <SelectItem value="fake_job">Fake Job Offer</SelectItem>
-                    <SelectItem value="investment">Investment Scam</SelectItem>
-                    <SelectItem value="giveaway">Fake Giveaway</SelectItem>
+                    <SelectItem value="telegram">Telegram Scam</SelectItem>
+                    <SelectItem value="instagram">Instagram Scam</SelectItem>
+                    <SelectItem value="job_scam">Fake Job Offer</SelectItem>
                     <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">{t("message")}</label>
-                <Textarea required value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})} placeholder="Paste the scam message here..." rows={5} />
+                <Textarea
+                  required
+                  value={formData.message}
+                  onChange={e => setFormData({ ...formData, message: e.target.value })}
+                  placeholder={t("scam_message_placeholder")}
+                  rows={5}
+                />
               </div>
-              <Button type="submit" className="w-full" disabled={submitReport.isPending}>{t("submit_report")}</Button>
+              <Button type="submit" className="w-full font-bold" disabled={submitReport.isPending}>
+                {submitReport.isPending ? t("submitting") : t("submit_report")}
+              </Button>
             </form>
           </DialogContent>
         </Dialog>
       </div>
 
+      {/* Educational examples notice */}
+      <div className="flex items-start gap-3 bg-primary/10 border border-primary/20 rounded-xl p-4 text-sm">
+        <Info className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+        <p className="text-foreground">{t("scams_examples_notice")}</p>
+      </div>
+
+      {/* Category filter — only show when there are reports */}
       {stats && stats.length > 0 && (
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
-          <Button 
-            variant={categoryFilter === "all" ? "default" : "outline"} 
+          <Button
+            variant={categoryFilter === "all" ? "default" : "outline"}
             onClick={() => setCategoryFilter("all")}
             className="rounded-full shrink-0"
           >
-            All Reports
+            {t("all_reports")}
           </Button>
           {stats.map(s => (
-            <Button 
-              key={s.category} 
+            <Button
+              key={s.category}
               variant={categoryFilter === s.category ? "default" : "outline"}
               onClick={() => setCategoryFilter(s.category)}
               className="rounded-full shrink-0"
             >
-              {s.category} ({s.count})
+              {categoryLabels[s.category] ?? s.category} ({s.count})
             </Button>
           ))}
         </div>
@@ -136,8 +166,8 @@ export default function Scams() {
                   <MessageSquare className="w-4 h-4 text-muted-foreground" />
                   {report.platform}
                 </div>
-                <span className="bg-background px-2 py-0.5 rounded text-xs font-bold text-muted-foreground border border-border">
-                  {report.category}
+                <span className="bg-background px-2 py-0.5 rounded text-xs font-bold text-muted-foreground border border-border uppercase tracking-wide">
+                  {categoryLabels[report.category] ?? report.category}
                 </span>
               </div>
               <CardContent className="p-4 md:p-6 space-y-4">
@@ -154,8 +184,10 @@ export default function Scams() {
             </Card>
           ))
         ) : (
-          <div className="text-center py-12 text-muted-foreground">
-            {t("empty_state")}
+          <div className="text-center py-16 space-y-3 text-muted-foreground">
+            <ShieldAlert className="w-12 h-12 mx-auto opacity-20" />
+            <p className="font-semibold text-foreground">{t("scams_empty_title")}</p>
+            <p className="text-sm">{t("scams_empty_desc")}</p>
           </div>
         )}
       </div>
