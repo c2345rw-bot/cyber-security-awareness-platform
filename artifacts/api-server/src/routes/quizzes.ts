@@ -6,6 +6,17 @@ import { SubmitQuizBody } from "@workspace/api-zod";
 
 const router = Router();
 
+/**
+ * GET /quizzes/challenge
+ * Returns up to 10 randomly ordered questions from all topics combined.
+ * Must be registered BEFORE the :lessonId wildcard route.
+ */
+router.get("/quizzes/challenge", async (_req, res) => {
+  const all = await db.select().from(quizQuestionsTable);
+  const shuffled = [...all].sort(() => Math.random() - 0.5).slice(0, 10);
+  res.json(shuffled);
+});
+
 router.get("/quizzes/:lessonId", async (req, res) => {
   const lessonId = parseInt(req.params.lessonId);
   if (isNaN(lessonId)) {
@@ -54,7 +65,6 @@ router.post("/quizzes/submit", async (req, res) => {
   const passed = score >= Math.ceil(total * 0.6);
   const xpEarned = passed ? Math.round(20 + (score / total) * 30) : 0;
 
-  // Update quiz score in user progress
   if (username) {
     const [existing] = await db
       .select()
@@ -68,10 +78,7 @@ router.post("/quizzes/submit", async (req, res) => {
         const newXp = existing.totalXp + (passed && prevScore < score ? xpEarned : 0);
         await db
           .update(userProgressTable)
-          .set({
-            quizScores: currentScores,
-            totalXp: newXp,
-          })
+          .set({ quizScores: currentScores, totalXp: newXp })
           .where(eq(userProgressTable.username, username));
       }
     }

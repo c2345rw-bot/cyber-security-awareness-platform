@@ -13,6 +13,9 @@ import Password from "@/pages/password";
 import Scams from "@/pages/scams";
 import Leaderboard from "@/pages/leaderboard";
 import Dashboard from "@/pages/dashboard";
+import Challenge from "@/pages/challenge";
+import Checklist from "@/pages/checklist";
+import About from "@/pages/about";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -36,6 +39,9 @@ function Router() {
         <Route path="/scams" component={Scams} />
         <Route path="/leaderboard" component={Leaderboard} />
         <Route path="/dashboard" component={Dashboard} />
+        <Route path="/challenge" component={Challenge} />
+        <Route path="/checklist" component={Checklist} />
+        <Route path="/about" component={About} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
