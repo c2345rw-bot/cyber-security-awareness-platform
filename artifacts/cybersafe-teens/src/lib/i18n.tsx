@@ -21,6 +21,7 @@ const translations: Translations = {
   nav_challenge: { en: 'Final Challenge', uz: 'Yakuniy sinov', ru: 'Финальный тест' },
   nav_checklist: { en: 'Safety Checklist', uz: "Xavfsizlik ro'yxati", ru: 'Чеклист безопасности' },
   nav_safe_downloads: { en: 'Safe Downloads', uz: 'Xavfsiz yuklab olish', ru: 'Безопасная загрузка' },
+  nav_phishing_quiz: { en: 'Phishing Quiz', uz: 'Fishing testi', ru: 'Фишинг-тест' },
   nav_about: { en: 'About', uz: 'Loyiha haqida', ru: 'О проекте' },
   tools_section: { en: 'Tools', uz: 'Vositalar', ru: 'Инструменты' },
 

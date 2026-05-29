@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import {
   Shield, BookOpen, AlertTriangle, KeyRound, Trophy,
   LayoutDashboard, Globe, Zap, ClipboardCheck, Info, Menu, X,
-  MessageSquare, Download
+  MessageSquare, Download, Fish
 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 
@@ -21,6 +21,7 @@ const TOOLS_NAV = [
   { href: "/challenge", icon: Zap, label: "nav_challenge" },
   { href: "/checklist", icon: ClipboardCheck, label: "nav_checklist" },
   { href: "/safe-downloads", icon: Download, label: "nav_safe_downloads" },
+  { href: "/phishing-quiz", icon: Fish, label: "nav_phishing_quiz" },
   { href: "/about", icon: Info, label: "nav_about" },
 ];
 
