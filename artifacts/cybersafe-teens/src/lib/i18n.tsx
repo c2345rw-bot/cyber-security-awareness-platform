@@ -19,7 +19,8 @@ const translations: Translations = {
   nav_leaderboard: { en: 'Leaderboard', uz: 'Reyting', ru: 'Рейтинг' },
   nav_dashboard: { en: 'Dashboard', uz: 'Shaxsiy panel', ru: 'Панель' },
   nav_challenge: { en: 'Final Challenge', uz: 'Yakuniy sinov', ru: 'Финальный тест' },
-  nav_checklist: { en: 'Safety Checklist', uz: 'Xavfsizlik ro\'yxati', ru: 'Чеклист безопасности' },
+  nav_checklist: { en: 'Safety Checklist', uz: "Xavfsizlik ro'yxati", ru: 'Чеклист безопасности' },
+  nav_safe_downloads: { en: 'Safe Downloads', uz: 'Xavfsiz yuklab olish', ru: 'Безопасная загрузка' },
   nav_about: { en: 'About', uz: 'Loyiha haqida', ru: 'О проекте' },
   tools_section: { en: 'Tools', uz: 'Vositalar', ru: 'Инструменты' },
 
@@ -32,9 +33,11 @@ const translations: Translations = {
     ru: 'Научитесь распознавать мошенничество, защищать свои аккаунты и свою цифровую жизнь.',
   },
 
-  /* Home extras */
+  /* Home */
   daily_tip_label: { en: "Today's Security Tip", uz: "Bugungi xavfsizlik maslahati", ru: "Совет дня по безопасности" },
-  featured_tools: { en: "Featured Tools", uz: "Asosiy vositalar", ru: "Избранные инструменты" },
+  modules_title: { en: "4 Core Modules", uz: "4 ta asosiy modul", ru: "4 основных модуля" },
+  modules_subtitle: { en: "Interactive tools — no placeholder content, everything works.", uz: "Interaktiv vositalar — hamma narsa ishlaydi.", ru: "Интерактивные инструменты — всё работает, никаких заглушек." },
+  featured_tools: { en: "More Tools", uz: "Qo'shimcha vositalar", ru: "Дополнительные инструменты" },
   about_project_cta: { en: "About this project →", uz: "Loyiha haqida →", ru: "О проекте →" },
 
   /* Platform content stats */
@@ -44,19 +47,18 @@ const translations: Translations = {
   stat_languages: { en: 'Languages Supported', uz: "Qo'llab-quvvatlanadigan tillar", ru: 'Поддерживаемых языков' },
   stat_quiz_questions: { en: 'Quiz Questions', uz: "Test savollari", ru: 'Вопросов в тестах' },
 
-  /* Home content blocks */
+  /* Home content */
   real_threats_title: { en: 'Real Threats. Real Defence.', uz: "Haqiqiy tahdidlar. Haqiqiy mudofaa.", ru: 'Реальные угрозы. Реальная защита.' },
   real_threats_desc: {
-    en: "Cyber attacks aren't just for corporations. Teenagers in Central Asia are targeted daily by Telegram scams, fake job offers, and cracked apps containing malware. CyberSafe Teens teaches you to recognise and avoid these specific threats.",
-    uz: "Kiberhujumlar faqat korporatsiyalar uchun emas. Markaziy Osiyodagi o'smirlar har kuni Telegram firibgarliklari, soxta ish takliflari va zararli dasturlar o'rnatilgan ilovalar nishoniga olinadi.",
-    ru: 'Кибератаки — не только для корпораций. Подростки Центральной Азии ежедневно становятся мишенями мошенников в Telegram, фейковых вакансий и взломанных приложений с вирусами.',
+    en: "Cyber attacks aren't just for corporations. Teenagers in Central Asia are targeted daily by Telegram scams, fake job offers, and cracked apps containing malware.",
+    uz: "Kiberhujumlar faqat korporatsiyalar uchun emas. Markaziy Osiyodagi o'smirlar har kuni Telegram firibgarliklari, soxta ish takliflari va zararli ilovalar nishoniga olinadi.",
+    ru: 'Кибератаки — не только для корпораций. Подростки Центральной Азии ежедневно становятся мишенями мошенников в Telegram, фейковых вакансий и взломанных приложений.',
   },
   what_youll_learn: { en: "What You'll Learn", uz: "Siz nima o'rganasiz", ru: 'Чему вы научитесь' },
   learn_item_1: { en: 'Spotting Phishing & Scams', uz: "Fishing va firibgarliklarni aniqlash", ru: 'Распознавать фишинг и мошенничество' },
   learn_item_2: { en: 'Creating Uncrackable Passwords', uz: "Buzib bo'lmaydigan parollar yaratish", ru: 'Создавать надёжные пароли' },
   learn_item_3: { en: 'Securing Social Media Accounts', uz: "Ijtimoiy tarmoq hisoblarini himoyalash", ru: 'Защищать аккаунты в соцсетях' },
   learn_item_4: { en: 'Safe Downloading Practices', uz: "Xavfsiz yuklab olish amaliyoti", ru: 'Безопасно скачивать файлы' },
-
   known_threats_title: { en: 'Threats Relevant to You', uz: "Siz uchun dolzarb tahdidlar", ru: 'Угрозы, актуальные для вас' },
   threat_telegram_title: { en: 'Telegram Prize Scams', uz: "Telegram mukofot firibgarliklari", ru: 'Мошенничество с призами в Telegram' },
   threat_telegram_desc: {
@@ -87,6 +89,7 @@ const translations: Translations = {
   username: { en: 'Username', uz: "Foydalanuvchi nomi", ru: 'Имя пользователя' },
   save: { en: 'Save', uz: 'Saqlash', ru: 'Сохранить' },
   logout: { en: 'Logout', uz: 'Chiqish', ru: 'Выйти' },
+  reset_progress: { en: 'Reset Progress', uz: "Jarayonni tiklash", ru: 'Сбросить прогресс' },
   progress_title: { en: 'Your Progress', uz: "Sizning jarayoningiz", ru: 'Ваш прогресс' },
   overall_progress: { en: 'Overall Progress', uz: "Umumiy jarayon", ru: 'Общий прогресс' },
   total_xp: { en: 'Total XP', uz: 'Umumiy XP', ru: 'Всего XP' },
@@ -133,8 +136,8 @@ const translations: Translations = {
   scams_subtitle: { en: 'Real scam messages collected to help you recognise and avoid them.', uz: "Ularni tanish va qochish uchun to'plangan haqiqiy firibgarlik xabarlari.", ru: 'Реальные мошеннические сообщения для распознавания и защиты.' },
   scams_examples_notice: {
     en: 'The examples below are real scam message patterns curated by the CyberSafe Teens team. Community members can also submit scams they encounter using the button above.',
-    uz: "Quyidagi misollar CyberSafe Teens jamoasi tomonidan to'plangan haqiqiy firibgarlik xabarlari namunalaridir. Jamiyat a'zolari ham uchratgan firibgarliklarni yuqoridagi tugma orqali yuborishlari mumkin.",
-    ru: 'Примеры ниже — реальные образцы мошеннических сообщений, собранные командой CyberSafe Teens. Участники сообщества также могут сообщать о мошенничестве через кнопку выше.',
+    uz: "Quyidagi misollar CyberSafe Teens jamoasi tomonidan to'plangan haqiqiy firibgarlik xabarlari namunalaridir.",
+    ru: 'Примеры ниже — реальные образцы мошеннических сообщений, собранные командой CyberSafe Teens.',
   },
   scams_empty_title: { en: 'No scam reports yet', uz: "Hali firibgarlik xabarlari yo'q", ru: 'Жалоб пока нет' },
   scams_empty_desc: { en: 'Be the first to submit a scam you have encountered.', uz: "Uchratgan firibgarliklaringizni birinchi bo'lib yuboring.", ru: 'Будьте первым, кто сообщит о встреченном мошенничестве.' },

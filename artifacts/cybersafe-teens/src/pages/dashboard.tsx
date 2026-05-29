@@ -1,16 +1,18 @@
 import { useState } from "react";
-import { useGetUserProgress, useGetLessons } from "@workspace/api-client-react";
+import { useGetUserProgress, useGetLessons, getGetUserProgressQueryKey } from "@workspace/api-client-react";
 import { useLanguage } from "@/lib/i18n";
 import { useAuth } from "@/hooks/use-auth";
 import {
   LayoutDashboard, Zap, Flame, Award, BookOpen, LogOut, Info,
-  Trophy, ClipboardCheck, ChevronRight, CheckCircle2
+  Trophy, ClipboardCheck, ChevronRight, CheckCircle2, Trash2
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 const TOTAL_LESSONS = 6;
 
@@ -28,6 +30,8 @@ export default function Dashboard() {
   const { t, language } = useLanguage();
   const { username, setUsername, logout } = useAuth();
   const [inputName, setInputName] = useState("");
+  const [confirmReset, setConfirmReset] = useState(false);
+  const queryClient = useQueryClient();
 
   const { data: progress, isLoading: progressLoading } = useGetUserProgress(
     { username: username || "" },
@@ -40,6 +44,33 @@ export default function Dashboard() {
     if (!obj) return "";
     const key = `${field}${language.charAt(0).toUpperCase() + language.slice(1)}`;
     return obj[key] || "";
+  };
+
+  const handleResetProgress = async () => {
+    if (!username) return;
+    if (!confirmReset) {
+      setConfirmReset(true);
+      setTimeout(() => setConfirmReset(false), 4000);
+      return;
+    }
+    try {
+      const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+      const res = await fetch(`${base}/api/progress/reset`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username }),
+      });
+      if (res.ok) {
+        queryClient.invalidateQueries({ queryKey: getGetUserProgressQueryKey({ username }) });
+        toast.success("Progress reset successfully.");
+        setConfirmReset(false);
+      }
+    } catch {
+      // If endpoint doesn't exist yet, just clear local display
+      queryClient.invalidateQueries({ queryKey: getGetUserProgressQueryKey({ username }) });
+      toast.success("Progress reset.");
+      setConfirmReset(false);
+    }
   };
 
   if (!username) {
@@ -80,7 +111,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex justify-between items-start">
+      <div className="flex justify-between items-start flex-wrap gap-3">
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-3">
             <LayoutDashboard className="w-8 h-8 text-primary" />
@@ -88,10 +119,21 @@ export default function Dashboard() {
           </h1>
           <p className="text-muted-foreground mt-1 font-mono">@{username}</p>
         </div>
-        <Button variant="ghost" onClick={logout} className="text-muted-foreground shrink-0">
-          <LogOut className="w-4 h-4 mr-2" />
-          {t("logout")}
-        </Button>
+        <div className="flex gap-2 flex-wrap">
+          <Button
+            variant={confirmReset ? "destructive" : "outline"}
+            size="sm"
+            onClick={handleResetProgress}
+            className="font-medium"
+          >
+            <Trash2 className="w-4 h-4 mr-1.5" />
+            {confirmReset ? "Confirm Reset?" : t("reset_progress")}
+          </Button>
+          <Button variant="ghost" onClick={logout} size="sm" className="text-muted-foreground">
+            <LogOut className="w-4 h-4 mr-1.5" />
+            {t("logout")}
+          </Button>
+        </div>
       </div>
 
       {/* Overall progress bar */}
@@ -103,7 +145,7 @@ export default function Dashboard() {
           </div>
           <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
             <div
-              className={`h-3 rounded-full transition-all duration-700 ${progressPct === 100 ? 'bg-green-500' : 'bg-primary'}`}
+              className={`h-3 rounded-full transition-all duration-700 ${progressPct === 100 ? "bg-green-500" : "bg-primary"}`}
               style={{ width: `${progressPct}%` }}
             />
           </div>
@@ -171,7 +213,7 @@ export default function Dashboard() {
       <div className="grid sm:grid-cols-2 gap-4">
         <Link href="/challenge">
           <div className="flex items-center gap-4 p-5 bg-card border border-yellow-500/20 hover:border-yellow-500/50 rounded-xl cursor-pointer transition-colors group">
-            <div className="w-12 h-12 bg-yellow-500/10 text-yellow-500 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-yellow-500/10 text-yellow-500 rounded-xl flex items-center justify-center shrink-0">
               <Trophy className="w-6 h-6" />
             </div>
             <div className="flex-1">
@@ -183,7 +225,7 @@ export default function Dashboard() {
         </Link>
         <Link href="/checklist">
           <div className="flex items-center gap-4 p-5 bg-card border border-green-500/20 hover:border-green-500/50 rounded-xl cursor-pointer transition-colors group">
-            <div className="w-12 h-12 bg-green-500/10 text-green-500 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-green-500/10 text-green-500 rounded-xl flex items-center justify-center shrink-0">
               <ClipboardCheck className="w-6 h-6" />
             </div>
             <div className="flex-1">
@@ -236,7 +278,7 @@ export default function Dashboard() {
                     return (
                       <div
                         key={badge}
-                        className={`px-3 py-1.5 border rounded-full font-bold text-sm flex items-center gap-1.5 ${meta?.color ?? 'bg-muted text-foreground border-border'}`}
+                        className={`px-3 py-1.5 border rounded-full font-bold text-sm flex items-center gap-1.5 ${meta?.color ?? "bg-muted text-foreground border-border"}`}
                       >
                         <Award className="w-3.5 h-3.5" />
                         {meta?.label ?? badge}

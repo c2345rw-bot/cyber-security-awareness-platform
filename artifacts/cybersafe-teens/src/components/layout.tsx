@@ -2,7 +2,8 @@ import { ReactNode, useState } from "react";
 import { Link, useLocation } from "wouter";
 import {
   Shield, BookOpen, AlertTriangle, KeyRound, Trophy,
-  LayoutDashboard, Globe, Zap, ClipboardCheck, Info, Menu, X, MessageSquare
+  LayoutDashboard, Globe, Zap, ClipboardCheck, Info, Menu, X,
+  MessageSquare, Download
 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 
@@ -19,6 +20,7 @@ const PRIMARY_NAV = [
 const TOOLS_NAV = [
   { href: "/challenge", icon: Zap, label: "nav_challenge" },
   { href: "/checklist", icon: ClipboardCheck, label: "nav_checklist" },
+  { href: "/safe-downloads", icon: Download, label: "nav_safe_downloads" },
   { href: "/about", icon: Info, label: "nav_about" },
 ];
 
@@ -160,7 +162,7 @@ export function Layout({ children }: { children: ReactNode }) {
           </div>
         </main>
 
-        {/* Mobile bottom nav — 5 key items */}
+        {/* Mobile bottom nav */}
         <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border flex justify-around py-2 z-50">
           {MOBILE_NAV.map(({ href, icon: Icon, label }) => {
             const active = isActive(href);

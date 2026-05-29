@@ -15,6 +15,7 @@ import Leaderboard from "@/pages/leaderboard";
 import Dashboard from "@/pages/dashboard";
 import Challenge from "@/pages/challenge";
 import Checklist from "@/pages/checklist";
+import SafeDownloads from "@/pages/safe-downloads";
 import About from "@/pages/about";
 import NotFound from "@/pages/not-found";
 
@@ -41,6 +42,7 @@ function Router() {
         <Route path="/dashboard" component={Dashboard} />
         <Route path="/challenge" component={Challenge} />
         <Route path="/checklist" component={Checklist} />
+        <Route path="/safe-downloads" component={SafeDownloads} />
         <Route path="/about" component={About} />
         <Route component={NotFound} />
       </Switch>
